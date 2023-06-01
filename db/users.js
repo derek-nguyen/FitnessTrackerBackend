@@ -40,6 +40,19 @@ async function getUser({ username, password }) {
 
 async function getUserById(userId) {
 
+  try {
+    const { rows: [user] } = await client.query(`
+      SELECT *
+      FROM users
+      WHERE id = $1
+    `, [userId]);
+
+    delete user.password
+    return user;
+  } catch (err) {
+    console.error('Error retrieving user by id')
+  }
+
 }
 
 async function getUserByUsername(userName) {
