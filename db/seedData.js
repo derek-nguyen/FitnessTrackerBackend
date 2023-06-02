@@ -4,6 +4,7 @@ const {
   createActivity,
   createRoutine,
   getRoutinesWithoutActivities,
+  getAllActivities,
 } = require("./");
 const client = require("./client");
 
@@ -235,6 +236,7 @@ async function createInitialRoutineActivities() {
 
 async function rebuildDB() {
   try {
+    client.connect();
     await dropTables();
     await createTables();
     await createInitialUsers();
