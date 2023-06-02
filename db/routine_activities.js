@@ -6,25 +6,22 @@ async function addActivityToRoutine({
   count,
   duration,
 }) {
-  await client.query(
-    `
-  INSERT INTO routine_activities("routineId", "activityId", count, duration)
-  VALUES ($1, $2, $3, $4)
-  RETURNING *;
-  `,
-    [routineId, activityId, count, duration]
-  );
+  await client.query(`
+    INSERT INTO routine_activities("routineId", "activityId", count, duration)
+    VALUES ($1, $2, $3, $4)
+    RETURNING *;
+  `, [routineId, activityId, count, duration]);
 }
 
-async function getRoutineActivityById(id) {}
+async function getRoutineActivityById(id) { }
 
-async function getRoutineActivitiesByRoutine({ id }) {}
+async function getRoutineActivitiesByRoutine({ id }) { }
 
-async function updateRoutineActivity({ id, ...fields }) {}
+async function updateRoutineActivity({ id, ...fields }) { }
 
-async function destroyRoutineActivity(id) {}
+async function destroyRoutineActivity(id) { }
 
-async function canEditRoutineActivity(routineActivityId, userId) {}
+async function canEditRoutineActivity(routineActivityId, userId) { }
 
 module.exports = {
   getRoutineActivityById,

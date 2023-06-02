@@ -5,6 +5,7 @@ const {
   createRoutine,
   getRoutinesWithoutActivities,
   getAllActivities,
+  addActivityToRoutine
 } = require("./");
 const client = require("./client");
 
@@ -227,6 +228,8 @@ async function createInitialRoutineActivities() {
       duration: 15,
     },
   ];
+
+  
   const routineActivities = await Promise.all(
     routineActivitiesToCreate.map(addActivityToRoutine)
   );
