@@ -95,7 +95,8 @@ async function updateActivity({ id, ...fields }) {
         `
         UPDATE activities 
         SET ${setString}
-        WHERE id = ${Object.keys(fields).length + 1}
+        WHERE id = $${Object.keys(fields).length + 1}
+        RETURNING *;
       `,
         [...Object.values(fields), id]
       );
