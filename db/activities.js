@@ -81,38 +81,38 @@ async function getActivityByName(name) {
 async function attachActivitiesToRoutines(routines) {}
 
 async function updateActivity({ id, ...fields }) {
-  // don't try to update the id
-  const setString = Object.keys(fields)
-    .map((key, index) => `"${key}"=$${index + 1}`)
-    .join(", ");
-  try {
-    // do update the name and description
-    // return the updated activity
-    if (setString.length > 0) {
-      const {
-        rows: [updatedActivity],
-      } = await client.query(
-        `
+    // don't try to update the id
+    const setString = Object.keys(fields)
+      .map((key, index) => `"${key}"=$${index + 1}`)
+      .join(", ");
+    try {
+      // do update the name and description
+      // return the updated activity
+      if (setString.length > 0) {
+        const {
+          rows: [updatedActivity],
+        } = await client.query(
+          `
         UPDATE activities 
         SET ${setString}
         WHERE id = $${Object.keys(fields).length + 1}
         RETURNING *;
       `,
-        [...Object.values(fields), id]
-      );
-      return updatedActivity;
+          [...Object.values(fields), id]
+        );
+        return updatedActivity;
+      }
+    } catch (err) {
+      console.error("Error updating activity");
+      throw err;
     }
-  } catch (err) {
-    console.error("Error updating activity");
-    throw err;
   }
-}
 
-module.exports = {
-  getAllActivities,
-  getActivityById,
-  getActivityByName,
-  attachActivitiesToRoutines,
-  createActivity,
-  updateActivity,
-};
+  module.exports = {
+    getAllActivities,
+    getActivityById,
+    getActivityByName,
+    attachActivitiesToRoutines,
+    createActivity,
+    updateActivity,
+  };
