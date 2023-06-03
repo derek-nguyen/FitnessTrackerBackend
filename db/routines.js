@@ -57,7 +57,7 @@ async function getAllRoutines() {
       u.username as "creatorName" 
     , r.*
     from routines r
-    join users u on u.id = r."creatorId"
+    join users u on u.id = r."creatorId";
     `);
 
     const routinesWithActivities = await attachActivitiesToRoutines(routines);

@@ -63,6 +63,7 @@ function expectRoutineToContainActivity(routine, fakeActivity) {
   const activity = routine.activities.find(
     (activity) => activity.id === fakeActivity.id
   );
+
   expect(activity).toEqual(
     objectContaining({
       id: fakeActivity.id,
@@ -166,7 +167,7 @@ describe("DB Routines", () => {
       expect(routine.creatorName).toEqual(fakeUser.username);
     });
 
-    xit("includes duration and count on activities, from routine_activities join", async () => {
+    it("includes duration and count on activities, from routine_activities join", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
@@ -176,13 +177,15 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    xit("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineActivityId on activities", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
         (activity) => activity.id === fakeActivity.id
       );
       expect(activity.routineId).toEqual(fakeRoutine.id);
+
+      console.log('Test for "includes the routineId and routineActivityId on activities',routine, activity);
       expect(activity.routineActivityId).toEqual(fakeRoutineActivity.id);
     });
   });
