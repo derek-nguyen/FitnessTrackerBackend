@@ -12,6 +12,7 @@ async function addActivityToRoutine({
     RETURNING *;
   `, [routineId, activityId, count, duration]);
 
+  // console.log(routinesAndActivities)
   return routinesAndActivities;
 }
 

@@ -33,7 +33,35 @@ async function getRoutinesWithoutActivities() {
 
 }
 
-async function getAllRoutines() { }
+async function getAllRoutines() {
+  try {
+
+    const { rows: routines } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.id 
+    , r."creatorId"
+    , r."isPublic"
+    , r.name
+    , r.goal
+    , ra."routineId"
+    , ra."activityId"
+    , a.*
+    from routines r
+    join users u on u.id = r."creatorId" 
+    join routine_activities ra on ra."routineId" = r.id
+    join activities a on a.id = ra."activityId"
+
+    `);
+
+    console.log(routines)
+    return routines;
+
+  } catch (err) {
+    console.error(err);
+  }
+
+}
 
 async function getAllPublicRoutines() { }
 
