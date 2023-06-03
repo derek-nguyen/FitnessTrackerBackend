@@ -78,41 +78,70 @@ async function getActivityByName(name) {
 }
 
 // used as a helper inside db/routines.js
-async function attachActivitiesToRoutines(routines) {}
+async function attachActivitiesToRoutines(routines) {
+  const { rows: routine_activities } = await client.query(`
+    SELECT *
+    FROM routine_activities
+  `);
+
+  console.log(routine_activities)
+  routines.map(routine => {
+    routine.activities = []
+    routine_activities.map(activity => {
+      let activityData = {
+        description: activity.description,
+        id: activity.id,
+        name: activity.name
+      }
+      // let activityData = {
+      //   id: activity.id,
+      //   duration: activity.duration,
+      //   count: activity.count
+      // }
+
+      if (activity.routineId === routine.id) {
+        routine.activities.push(activityData)
+      }
+    })
+
+  })
+  
+  return routines;
+}
 
 async function updateActivity({ id, ...fields }) {
-    // don't try to update the id
-    const setString = Object.keys(fields)
-      .map((key, index) => `"${key}"=$${index + 1}`)
-      .join(", ");
-    try {
-      // do update the name and description
-      // return the updated activity
-      if (setString.length > 0) {
-        const {
-          rows: [updatedActivity],
-        } = await client.query(
-          `
+  // don't try to update the id
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+  try {
+    // do update the name and description
+    // return the updated activity
+    if (setString.length > 0) {
+      const {
+        rows: [updatedActivity],
+      } = await client.query(
+        `
         UPDATE activities 
         SET ${setString}
         WHERE id = $${Object.keys(fields).length + 1}
         RETURNING *;
       `,
-          [...Object.values(fields), id]
-        );
-        return updatedActivity;
-      }
-    } catch (err) {
-      console.error("Error updating activity");
-      throw err;
+        [...Object.values(fields), id]
+      );
+      return updatedActivity;
     }
+  } catch (err) {
+    console.error("Error updating activity");
+    throw err;
   }
+}
 
-  module.exports = {
-    getAllActivities,
-    getActivityById,
-    getActivityByName,
-    attachActivitiesToRoutines,
-    createActivity,
-    updateActivity,
-  };
+module.exports = {
+  getAllActivities,
+  getActivityById,
+  getActivityByName,
+  attachActivitiesToRoutines,
+  createActivity,
+  updateActivity,
+};

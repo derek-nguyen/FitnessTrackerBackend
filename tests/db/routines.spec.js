@@ -155,12 +155,12 @@ describe("DB Routines", () => {
       expectRoutineToContainActivity(routine, fakeActivity2);
     });
 
-    xit("should not include a routine more than once", async () => {
+    it("should not include a routine more than once", async () => {
       const routines = await getAllRoutines();
       expectRoutinesNotToContainDuplicates(routines, fakeRoutine);
     });
 
-    xit("includes username, from users join, aliased as creatorName", async () => {
+    it("includes username, from users join, aliased as creatorName", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       expect(routine.creatorName).toEqual(fakeUser.username);
