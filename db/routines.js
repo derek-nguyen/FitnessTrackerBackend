@@ -13,7 +13,21 @@ async function createRoutine({ creatorId, isPublic, name, goal }) {
   }
 }
 
-async function getRoutineById(id) { }
+async function getRoutineById(id) {
+  try {
+    const { rows: [routine] } = await client.query(`
+      SELECT *
+      FROM routines 
+      WHERE id = $1
+    `,[id]);
+
+    return routine;
+  } catch (err) {
+    console.error('Unable to get routine by id',err)
+    throw err;
+  }
+
+ }
 
 async function getRoutinesWithoutActivities() {
   // TEST: Will temporarily return all routines
@@ -32,9 +46,6 @@ async function getRoutinesWithoutActivities() {
   }
 
 }
-
-// create a function getAllRoutines to pass the test in routines.spec.js 
-
 
 async function getAllRoutines() {
   
