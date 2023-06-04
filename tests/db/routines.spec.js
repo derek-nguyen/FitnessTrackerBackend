@@ -420,7 +420,6 @@ describe("DB Routines", () => {
         goal: faker.random.uuid(),
       });
 
-      console.log("Fake Routine ID to update: ", fakeRoutine.id);
       expect(updatedRoutine.id).toEqual(fakeRoutine.id);
     });
 
