@@ -21,15 +21,15 @@ async function getRoutineById(id) {
       SELECT *
       FROM routines 
       WHERE id = $1
-    `,[id]);
+    `, [id]);
 
     return routine;
   } catch (err) {
-    console.error('Unable to get routine by id',err)
+    console.error('Unable to get routine by id', err)
     throw err;
   }
 
- }
+}
 
 async function getRoutinesWithoutActivities() {
   // TEST: Will temporarily return all routines
@@ -50,7 +50,7 @@ async function getRoutinesWithoutActivities() {
 }
 
 async function getAllRoutines() {
-  
+
   try {
     const { rows: routines } = await client.query(`
     select
@@ -61,16 +61,35 @@ async function getAllRoutines() {
     `);
 
     const routinesWithActivities = await attachActivitiesToRoutines(routines);
-    console.log(routinesWithActivities[15]);
     return routinesWithActivities;
 
   } catch (err) {
     console.error(err);
+    throw err
   }
 
 }
 
-async function getAllPublicRoutines() { }
+async function getAllPublicRoutines() {
+  try {
+    const { rows: publicRoutines } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.*
+    from routines r
+    join users u on u.id = r."creatorId"
+    where r."isPublic" = true;
+    `)
+
+    const publicRoutinesWithActivities = await attachActivitiesToRoutines(publicRoutines);
+    return publicRoutinesWithActivities
+
+  } catch (err) {
+    console.error(err);
+    throw err
+  }
+
+}
 
 async function getAllRoutinesByUser({ username }) { }
 
