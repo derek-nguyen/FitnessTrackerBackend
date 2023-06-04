@@ -91,11 +91,71 @@ async function getAllPublicRoutines() {
 
 }
 
-async function getAllRoutinesByUser({ username }) { }
+async function getAllRoutinesByUser({ username }) {
+  try {
+    const { rows: userRoutines } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.*
+    from routines r
+    join users u on u.id = r."creatorId"
+    where u.username = $1;
+    `, [username])
 
-async function getPublicRoutinesByUser({ username }) { }
+    const userRoutinesWithActivities = await attachActivitiesToRoutines(userRoutines);
+    return userRoutinesWithActivities
 
-async function getPublicRoutinesByActivity({ id }) { }
+  } catch (err) {
+    console.error(err);
+    throw err
+  }
+
+}
+
+async function getPublicRoutinesByUser({ username }) {
+  try {
+    const { rows: userPublicRoutines } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.*
+    from routines r
+    join users u on u.id = r."creatorId"
+    where u.username = $1 and r."isPublic" = true;
+    `, [username])
+
+    const userPublicRoutinesWithActivities = await attachActivitiesToRoutines(userPublicRoutines);
+    return userPublicRoutinesWithActivities
+
+  } catch (err) {
+    console.error(err);
+    throw err
+  }
+
+}
+
+async function getPublicRoutinesByActivity({ id }) {
+  try {
+    const { rows: publicRoutinesActivity } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.*
+    from routines r
+    join users u on u.id = r."creatorId"
+    where r."isPublic" = true;
+    `)
+
+    const activityPublicRoutines = await attachActivitiesToRoutines(publicRoutinesActivity);
+
+    console.log('Activity Test ID', id)
+    console.log(activityPublicRoutines[0])
+
+    return activityPublicRoutines
+
+  } catch (err) {
+    console.error(err);
+    throw err
+  }
+}
 
 async function updateRoutine({ id, ...fields }) { }
 
