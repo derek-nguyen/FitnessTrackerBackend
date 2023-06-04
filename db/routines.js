@@ -177,7 +177,7 @@ async function getPublicRoutinesByActivity({ id }) {
 
     console.log("Activity Test ID", id);
 
-    return publicRoutinesActivity;
+    return routines;
   } catch (err) {
     console.error(err);
     throw err;
