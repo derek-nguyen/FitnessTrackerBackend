@@ -145,42 +145,30 @@ async function getPublicRoutinesByUser({ username }) {
 
 async function getPublicRoutinesByActivity({ id }) {
   try {
-    const { rows: routines } = await client.query(`
-    SELECT routines.*, users.username AS "creatorName"
-    FROM routines 
-    INNER JOIN users
-    ON routines."creatorId"=users.id
-    WHERE routines."isPublic"=true
-    `);
+    const { rows: publicRoutinesActivity } = await client.query(`
+    select
+      u.username as "creatorName" 
+    , r.*
+    from routines r
+    join users u on u.id = r."creatorId"
+    where r."isPublic" = true;
+    `)
 
-    const { rows: routine_activities } = await client.query(`
-    SELECT * 
-    FROM routine_activities;
-`);
+    const activityPublicRoutines = await attachActivitiesToRoutines(publicRoutinesActivity);
 
-    routines.map((routine) => {
-      routine.activities = [];
+    // loop through the array of objects of activityPublicRoutines and filter out the 
+    // ones that don't have the activity id we passed in from obj.activities.activityId
+    const filteredActivityPublicRoutines = activityPublicRoutines.filter(obj => { 
+      return obj.activities.some(activity => {
+        return activity.id === id
+      })
+    })
 
-      routine_activities.map((activity) => {
-        let workoutData = {
-          id: activity.id,
-          activityId: activity.activityId,
-          count: activity.count,
-          duration: activity.duration,
-        };
-        if (activity.routineId === routine.id) {
-          if (activity.activityId === id);
-          routine.activities.push(workoutData);
-        }
-      });
-    });
+    return filteredActivityPublicRoutines
 
-    console.log("Activity Test ID", id);
-
-    return routines;
   } catch (err) {
     console.error(err);
-    throw err;
+    throw err
   }
 }
 
