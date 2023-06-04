@@ -156,9 +156,7 @@ async function getPublicRoutinesByActivity({ id }) {
 
     const activityPublicRoutines = await attachActivitiesToRoutines(publicRoutinesActivity);
 
-    // loop through the array of objects of activityPublicRoutines and filter out the 
-    // ones that don't have the activity id we passed in from obj.activities.activityId
-    const filteredActivityPublicRoutines = activityPublicRoutines.filter(obj => { 
+    const filteredActivityPublicRoutines = activityPublicRoutines.filter(obj => {
       return obj.activities.some(activity => {
         return activity.id === id
       })
@@ -172,9 +170,56 @@ async function getPublicRoutinesByActivity({ id }) {
   }
 }
 
-async function updateRoutine({ id, ...fields }) {}
+async function updateRoutine({ id, ...fields }) {
 
-async function destroyRoutine(id) {}
+  const setString = Object.keys(fields)
+    .map((key, index) => `"${key}"=$${index + 1}`)
+    .join(", ");
+
+  try {
+    if (setString.length > 0) {
+      const { rows: [updatedRoutine] } = await client.query(`
+        UPDATE routines
+        SET ${setString}
+        WHERE id = $${Object.keys(fields).length + 1}
+        RETURNING *;
+      `, [...Object.values(fields), id]);
+
+      // console.log("Updated Routine", updatedRoutine);
+      return updatedRoutine;
+    }
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+}
+
+
+async function destroyRoutine(id) {
+  // removes routine from database
+  // deletes all the routine_activities whose routine is the one being deleted
+
+  try {
+    await client.query(`
+      DELETE FROM routine_activities
+      WHERE "routineId" = $1;
+    `, [id]);
+    // console.log(deletedRoutineActivities);
+
+    await client.query(`
+          DELETE FROM routines
+          WHERE id = $1;
+        `, [id])
+
+
+
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+
+}
 
 module.exports = {
   getRoutineById,

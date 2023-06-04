@@ -112,7 +112,7 @@ async function attachActivitiesToRoutines(routines) {
     })
 
   })
-  
+
   return routines;
 }
 
@@ -125,17 +125,13 @@ async function updateActivity({ id, ...fields }) {
     // do update the name and description
     // return the updated activity
     if (setString.length > 0) {
-      const {
-        rows: [updatedActivity],
-      } = await client.query(
-        `
+      const { rows: [updatedActivity] } = await client.query(`
         UPDATE activities 
         SET ${setString}
         WHERE id = $${Object.keys(fields).length + 1}
         RETURNING *;
-      `,
-        [...Object.values(fields), id]
-      );
+      `, [...Object.values(fields), id]);
+
       return updatedActivity;
     }
   } catch (err) {
