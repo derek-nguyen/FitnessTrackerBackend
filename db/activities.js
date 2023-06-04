@@ -80,7 +80,14 @@ async function getActivityByName(name) {
 // used as a helper inside db/routines.js
 async function attachActivitiesToRoutines(routines) {
   const { rows: routine_activities } = await client.query(`
-    select *
+    select 
+      ra.id 
+      , ra."routineId" 
+      , ra."activityId" 
+      , ra.duration 
+      , ra.count 
+      , a."name" 
+      , a.description 
     from routine_activities ra 
     join activities a on ra."activityId" = a.id;
   `);
@@ -88,14 +95,15 @@ async function attachActivitiesToRoutines(routines) {
   routines.map(routine => {
     routine.activities = []
     routine_activities.map(activity => {
+      // console.log(activity.id, activity.activityId)
       let activityData = {
         description: activity.description,
-        id: activity.id,
+        id: activity.activityId,
         name: activity.name,
         duration: activity.duration,
         count: activity.count,
         routineId: activity.routineId,
-        routineActivityId: activity.activityId
+        routineActivityId: activity.id
       }
 
       if (activity.routineId === routine.id) {
