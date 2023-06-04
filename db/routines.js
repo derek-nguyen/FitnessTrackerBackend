@@ -176,14 +176,9 @@ async function getPublicRoutinesByActivity({ id }) {
       });
     });
 
-    const activityPublicRoutines = await attachActivitiesToRoutines(
-      publicRoutinesActivity
-    );
-
     console.log("Activity Test ID", id);
-    console.log(activityPublicRoutines[0]);
 
-    return activityPublicRoutines;
+    return publicRoutinesActivity;
   } catch (err) {
     console.error(err);
     throw err;
