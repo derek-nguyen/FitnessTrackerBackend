@@ -1,12 +1,72 @@
-const express = require('express');
-const router = express.Router();
+const express = require("express");
+const activitiesRouter = express.Router();
+const { requireUser } = require("./utils");
+const {
+  getAllActivities,
+  createActivity,
+  updateActivity,
+  getPublicRoutinesByActivity,
+} = require("../db");
 
-// GET /api/activities/:activityId/routines
+activitiesRouter.use((req, res, next) => {
+  console.log("A request has been made to /activities");
 
-// GET /api/activities
+  next();
+});
 
-// POST /api/activities
+activitiesRouter.get("/", async (req, res, next) => {
+  try {
+    const activities = await getAllActivities();
 
-// PATCH /api/activities/:activityId
+    if (activities) {
+      res.send(activities);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 
-module.exports = router;
+activitiesRouter.post("/", async (req, res, next) => {
+  const { name, description } = req.body;
+  const activityData = { name, description };
+
+  try {
+    const activityPost = await createActivity(activityData);
+    // console.log(activityPost);
+
+    if (activityPost) {
+      res.send(activityPost);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
+  const id = req.params.activityId;
+  const { name, description } = req.body;
+
+  try {
+    const updatedActivity = await updateActivity({ id, name, description });
+    if (updatedActivity) {
+      res.send(updatedActivity);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
+  const { activityId } = req.params;
+  try {
+    const activities = await getPublicRoutinesByActivity({ activityId });
+
+    if (activities) {
+      res.send(activities);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+module.exports = activitiesRouter;
