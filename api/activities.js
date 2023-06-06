@@ -7,6 +7,7 @@ const {
   updateActivity,
   getPublicRoutinesByActivity,
   getActivityByName,
+  getActivityById,
 } = require("../db");
 
 activitiesRouter.use((req, res, next) => {
@@ -54,13 +55,27 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
   const id = req.params.activityId;
   const { name, description } = req.body;
 
+  const _activity = await getActivityById(id);
+
   try {
-    const updatedActivity = await updateActivity({ id, name, description });
-    if (updatedActivity) {
-      res.send(updatedActivity);
-    } else {
-      next(error);
+    if (!_activity) {
+      next({
+        name: "xyz",
+        message: `Activity ${id} not found`,
+        error: "xyz",
+      });
     }
+
+    if (_activity.id === id) {
+      next({
+        message: `Activity ${id} not found`,
+        error: "xyz",
+      });
+    }
+
+    const updatedActivity = await updateActivity({ id, name, description });
+
+    res.send(updatedActivity);
   } catch (error) {
     next(error);
   }
