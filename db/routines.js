@@ -142,7 +142,7 @@ async function getPublicRoutinesByUser({ username }) {
     throw err;
   }
 }
-
+//todo i think my refactor doesnt pass other test
 async function getPublicRoutinesByActivity({ id }) {
   try {
     const { rows: publicRoutinesActivity } = await client.query(`
@@ -152,38 +152,45 @@ async function getPublicRoutinesByActivity({ id }) {
     from routines r
     join users u on u.id = r."creatorId"
     where r."isPublic" = true;
-    `)
+    `);
 
-    const activityPublicRoutines = await attachActivitiesToRoutines(publicRoutinesActivity);
+    const activityPublicRoutines = await attachActivitiesToRoutines(
+      publicRoutinesActivity
+    );
 
-    const filteredActivityPublicRoutines = activityPublicRoutines.filter(obj => {
-      return obj.activities.some(activity => {
-        return activity.id === id
-      })
-    })
+    const filteredActivityPublicRoutines = activityPublicRoutines.filter(
+      (obj) => {
+        return obj.activities.some((activity) => {
+          return activity.id === id;
+        });
+      }
+    );
 
-    return filteredActivityPublicRoutines
-
+    return filteredActivityPublicRoutines;
   } catch (err) {
     console.error(err);
-    throw err
+    throw err;
   }
 }
 
 async function updateRoutine({ id, ...fields }) {
-
   const setString = Object.keys(fields)
     .map((key, index) => `"${key}"=$${index + 1}`)
     .join(", ");
 
   try {
     if (setString.length > 0) {
-      const { rows: [updatedRoutine] } = await client.query(`
+      const {
+        rows: [updatedRoutine],
+      } = await client.query(
+        `
         UPDATE routines
         SET ${setString}
         WHERE id = $${Object.keys(fields).length + 1}
         RETURNING *;
-      `, [...Object.values(fields), id]);
+      `,
+        [...Object.values(fields), id]
+      );
 
       // console.log("Updated Routine", updatedRoutine);
       return updatedRoutine;
@@ -192,31 +199,33 @@ async function updateRoutine({ id, ...fields }) {
     console.error(err);
     throw err;
   }
-
 }
-
 
 async function destroyRoutine(id) {
   // removes routine from database
   // deletes all the routine_activities whose routine is the one being deleted
 
   try {
-    await client.query(`
+    await client.query(
+      `
       DELETE FROM routine_activities
       WHERE "routineId" = $1;
-    `, [id]);
+    `,
+      [id]
+    );
     // console.log(deletedRoutineActivities);
 
-    await client.query(`
+    await client.query(
+      `
           DELETE FROM routines
           WHERE id = $1;
-        `, [id])
-
+        `,
+      [id]
+    );
   } catch (err) {
     console.error(err);
     throw err;
   }
-
 }
 
 module.exports = {

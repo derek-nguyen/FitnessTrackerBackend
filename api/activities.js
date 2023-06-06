@@ -42,7 +42,8 @@ activitiesRouter.post("/", async (req, res, next) => {
   }
 });
 
-activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
+//todo probably want to use requireUser middleware later
+activitiesRouter.patch("/:activityId", async (req, res, next) => {
   const id = req.params.activityId;
   const { name, description } = req.body;
 
@@ -50,12 +51,15 @@ activitiesRouter.patch("/:activityId", requireUser, async (req, res, next) => {
     const updatedActivity = await updateActivity({ id, name, description });
     if (updatedActivity) {
       res.send(updatedActivity);
+    } else {
+      next(error);
     }
   } catch (error) {
     next(error);
   }
 });
 
+//todo need to refactor getPublicRoutinesByActivity
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   const { activityId } = req.params;
   try {
