@@ -6,6 +6,7 @@ const {
   createActivity,
   updateActivity,
   getPublicRoutinesByActivity,
+  getActivityByName,
 } = require("../db");
 
 activitiesRouter.use((req, res, next) => {
@@ -31,12 +32,18 @@ activitiesRouter.post("/", async (req, res, next) => {
   const activityData = { name, description };
 
   try {
+    const _activity = await getActivityByName(name);
+    if (_activity) {
+      next({
+        name: "xyz",
+        message: `An activity with name ${name} already exists`,
+        error: "xyz",
+      });
+    }
     const activityPost = await createActivity(activityData);
     // console.log(activityPost);
 
-    if (activityPost) {
-      res.send(activityPost);
-    }
+    res.send(activityPost);
   } catch (error) {
     next(error);
   }
