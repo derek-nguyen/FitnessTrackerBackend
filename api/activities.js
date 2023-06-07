@@ -55,15 +55,14 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
   const id = req.params.activityId;
   const { name, description } = req.body;
 
-  
   try {
     const _activity = await getActivityById(id);
 
-    if ( !_activity || _activity.id === id) {
+    if (!_activity || _activity.id === id) {
       next({
-        name: 'Error',
+        name: "Error",
         message: `Activity ${id} not found`,
-        error: "xyz"
+        error: "xyz",
       });
     }
 
@@ -75,33 +74,38 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
     //   });
     // }
 
-
     const updatedActivity = await updateActivity({ id, name, description });
 
     res.send(updatedActivity);
   } catch (error) {
-    if (error.code === '23505') {
+    if (error.code === "23505") {
       next({
-        name: 'Error',
+        name: "Error",
         message: `An activity with name ${name} already exists`,
-        error: "xyz"
+        error: "xyz",
       });
     } else {
       next(error);
     }
-  
   }
 });
 
 //todo need to refactor getPublicRoutinesByActivity
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   const { activityId } = req.params;
+
+  if (!(await getActivityById(activityId))) {
+    next({
+      name: "Error",
+      message: `Activity ${activityId} not found`,
+      error: "xyz",
+    });
+  }
+
   try {
     const activities = await getPublicRoutinesByActivity({ activityId });
 
-    if (activities) {
-      res.send(activities);
-    }
+    res.send(activities);
   } catch (error) {
     next(error);
   }

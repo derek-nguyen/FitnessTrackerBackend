@@ -165,7 +165,7 @@ async function getPublicRoutinesByActivity({ id }) {
         });
       }
     );
-
+    console.log("this is fapr", filteredActivityPublicRoutines);
     return filteredActivityPublicRoutines;
   } catch (err) {
     console.error(err);
