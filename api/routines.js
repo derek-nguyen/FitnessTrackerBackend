@@ -5,6 +5,7 @@ const {
   createRoutine,
   updateRoutine,
   destroyRoutine,
+  getRoutineById,
 } = require("../db/routines");
 const { addActivityToRoutine } = require("../db/routine_activities");
 const { requireUser } = require("./utils");
@@ -24,19 +25,19 @@ routinesRouter.get("/", async (req, res, next) => {
   }
 });
 
+//todo put back requireUser middleware later
 routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { isPublic, name, goal } = req.body;
-  const creatorId = req.user.id;
-
-  console.log(requireUser)
+  // const creatorId = req.user.id;
 
   try {
     const newRoutine = await createRoutine({
-      creatorId,
+      // creatorId,
       isPublic,
       name,
       goal,
     });
+
     res.send(newRoutine);
   } catch ({ name, message }) {
     next({ name, message });
@@ -45,18 +46,21 @@ routinesRouter.post("/", requireUser, async (req, res, next) => {
 
 routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
+  const routine = await getRoutineById(routineId);
+  const { name, goal, isPublic } = req.body;
 
   try {
-    if (Object.keys(req.body).length === 0) {
-      throw Error("No update fields");
+    if (req.user.id === routine.creatorId) {
+      const updatedRoutine = await updateRoutine({
+        id: routineId,
+        name,
+        goal,
+        isPublic,
+      });
+      res.send(updatedRoutine);
     }
-
-    const updateFields = { id: routineId, ...req.body };
-    console.log(updateFields);
-    const updatedRoutine = await updateRoutine(updateFields);
-    res.send(updatedRoutine);
-  } catch ({ name, message }) {
-    next({ name, message });
+  } catch (error) {
+    throw error;
   }
 });
 
