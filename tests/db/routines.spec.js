@@ -177,7 +177,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    it("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineId on activities", async () => {
       const routines = await getAllRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
@@ -228,7 +228,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    it("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineId on activities", async () => {
       const routines = await getAllPublicRoutines();
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
@@ -284,7 +284,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    it("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineId on activities", async () => {
       const routines = await getAllRoutinesByUser(fakeUser);
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
@@ -335,7 +335,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    it("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineId on activities", async () => {
       const routines = await getPublicRoutinesByUser(fakeUser);
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
@@ -398,7 +398,7 @@ describe("DB Routines", () => {
       expect(activity.count).toEqual(fakeRoutineActivity.count);
     });
 
-    it("includes the routineId and routineActivityId on activities", async () => {
+    it("includes the routineId and routineId on activities", async () => {
       const routines = await getPublicRoutinesByActivity(fakeActivity);
       const routine = routines.find((routine) => routine.id === fakeRoutine.id);
       const activity = routine.activities.find(
