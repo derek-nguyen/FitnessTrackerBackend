@@ -25,7 +25,6 @@ routinesRouter.get("/", async (req, res, next) => {
   }
 });
 
-//todo put back requireUser middleware later
 routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { isPublic, name, goal } = req.body;
   const creatorId = req.user.id;
@@ -50,6 +49,14 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   const { name, goal, isPublic } = req.body;
 
   try {
+    //todo
+    if (req.user.id !== routine.creatorId) {
+      res.status(403).send({
+        error: "xyz",
+        message: `User ${req.user.username} is not allowed to update ${routine.name}`,
+        name: "xyz",
+      });
+    }
     if (req.user.id === routine.creatorId) {
       const updatedRoutine = await updateRoutine({
         id: routineId,
@@ -66,12 +73,18 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 
 routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
-
+  let routine = await getRoutineById(req.params.routineId);
   try {
-    const deletedRoutine = await destroyRoutine(routineId);
-    res.send(deletedRoutine);
-  } catch ({ name, message }) {
-    next({ name, message });
+    if (req.user.id === routine.creatorId) {
+      const deleteRoutine = await destroyRoutine(routineId);
+      res.send(deleteRoutine);
+    } else {
+      next({
+        message: "You must be the creator of this routine to delete it",
+      });
+    }
+  } catch (error) {
+    res.status(403).send(error);
   }
 });
 
@@ -81,6 +94,10 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
 
   if (!activityId || !count || !duration) {
     res.send({ message: "Missing fields" });
+  }
+
+  if (routineId === activityId) {
+    res.send({ message: "Pair already exists" });
   }
 
   try {
