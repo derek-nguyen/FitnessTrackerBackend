@@ -28,6 +28,8 @@ routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { isPublic, name, goal } = req.body;
   const creatorId = req.user.id;
 
+  console.log(requireUser)
+
   try {
     const newRoutine = await createRoutine({
       creatorId,
