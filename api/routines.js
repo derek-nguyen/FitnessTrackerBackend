@@ -97,9 +97,12 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
   if (!activityId || !count || !duration) {
     res.send({ message: "Missing fields" });
   }
-
+  //todo
   if (routineId === activityId) {
-    res.send({ message: "Pair already exists" });
+    res.send({
+      error: "xyz",
+      message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`,
+    });
   }
 
   try {
@@ -110,8 +113,12 @@ routinesRouter.post("/:routineId/activities", async (req, res, next) => {
       duration,
     });
     res.send(newRoutineActivity);
-  } catch ({ name, message }) {
-    next({ name, message });
+  } catch (error) {
+    next({
+      error: "xyz",
+      message: `Activity ID ${activityId} already exists in Routine ID ${routineId}`,
+      name: "xyz",
+    });
   }
 });
 
