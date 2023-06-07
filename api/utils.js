@@ -1,13 +1,13 @@
 const requireUser = (req, res, next) => {
   if (!req.user) {
     next({
-      name: "MissingUserError",
+      name: "AuthError",
       message: "You must be logged in to perform this action",
     });
+  } else {
+    console.log("User is set");
+    return next();
   }
-  next();
 };
 
-module.exports = {
-  requireUser,
-};
+module.exports = { requireUser };
