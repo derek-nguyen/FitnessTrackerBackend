@@ -49,7 +49,6 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
   const { name, goal, isPublic } = req.body;
 
   try {
-    //todo
     if (req.user.id !== routine.creatorId) {
       res.status(403).send({
         error: "xyz",
@@ -73,14 +72,17 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
 
 routinesRouter.delete("/:routineId", requireUser, async (req, res, next) => {
   const { routineId } = req.params;
-  let routine = await getRoutineById(req.params.routineId);
+  const routine = await getRoutineById(req.params.routineId);
+  const { creatorId, goal, id, isPublic, name } = routine;
   try {
     if (req.user.id === routine.creatorId) {
-      const deleteRoutine = await destroyRoutine(routineId);
-      res.send(deleteRoutine);
+      await destroyRoutine(routineId);
+      res.send({ creatorId, goal, id, isPublic, name });
     } else {
-      next({
-        message: "You must be the creator of this routine to delete it",
+      res.status(403).send({
+        error: "xyz",
+        message: `User ${req.user.username} is not allowed to delete ${routine.name}`,
+        name: "xyz",
       });
     }
   } catch (error) {
