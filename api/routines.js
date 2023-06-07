@@ -28,11 +28,11 @@ routinesRouter.get("/", async (req, res, next) => {
 //todo put back requireUser middleware later
 routinesRouter.post("/", requireUser, async (req, res, next) => {
   const { isPublic, name, goal } = req.body;
-  // const creatorId = req.user.id;
+  const creatorId = req.user.id;
 
   try {
     const newRoutine = await createRoutine({
-      // creatorId,
+      creatorId,
       isPublic,
       name,
       goal,
@@ -60,7 +60,7 @@ routinesRouter.patch("/:routineId", requireUser, async (req, res, next) => {
       res.send(updatedRoutine);
     }
   } catch (error) {
-    throw error;
+    next(error);
   }
 });
 
