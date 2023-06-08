@@ -33,8 +33,15 @@ routine_activitiesRouter.patch(
         });
         console.log(updatedRoutineActivity);
         res.send(updatedRoutineActivity);
+      } else {
+        res.send({
+          error: 'Cannot update routine with activity',
+          message: `User ${req.user.username} is not allowed to update In the evening`,
+          name: 'Update error'
+        })
       }
     } catch (error) {
+      console.log(error)
       next(error);
     }
   }
@@ -53,6 +60,12 @@ routine_activitiesRouter.delete(
           routineActivityId
         );
         res.send(deletedRoutineActivity);
+      } else {
+        res.status(403).send({
+          error: 'Cannot delete',
+          message: `User ${req.user.username} is not allowed to delete In the afternoon`,
+          name: 'Unauthorized'
+        })
       }
     } catch (error) {
       next(error);
