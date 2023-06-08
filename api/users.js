@@ -2,6 +2,8 @@
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
+const JWT_SECRET = process.env.JWT_SECRET
 
 const {
     createUser,
@@ -18,7 +20,7 @@ router.post('/register', async (req, res, next) => {
 
     const existingUser = await getUserByUsername(username);
 
-    console.log('Existing user', existingUser)
+    // console.log('Existing user', existingUser)
 
     try {
 
@@ -41,7 +43,7 @@ router.post('/register', async (req, res, next) => {
                 username,
                 password
             });
-            console.log('New user created', newUser)
+            // console.log('New user created', newUser)
 
             const response = {
                 "message": 'Successfully created user!',
@@ -60,8 +62,93 @@ router.post('/register', async (req, res, next) => {
 
 // POST /api/users/login
 
+router.post('/login', async (req, res, next) => {
+    const { username, password } = req.body;
+
+    const user = await getUserByUsername(username);
+
+    if (user && await bcrypt.compare(password, user.password)) {
+
+        const payload = {
+            id: user.id,
+            username: user.username
+        }
+        const token = jwt.sign(payload, JWT_SECRET)
+
+        const response = {
+            user: { id: user.id, username: username },
+            message: `you're logged in!`,
+            token: token
+        }
+
+        res.send(response);
+    } else {
+        res.status(401).send({
+            error: `Username or password is incorrect.`,
+            message: `Username or password is incorrect.`,
+            name: 'IncorrectCredentialsError',
+        });
+    }
+});
+
 // GET /api/users/me
 
+router.get('/me', async (req, res, next) => {
+
+    try {
+        const authHeader = req.headers.authorization
+
+        if (!authHeader) {
+            res.status(401).send({
+                error: 'No token provided',
+                message: 'You must be logged in to perform this action',
+                name: 'NoTokenError'
+            })
+
+        } else {
+            const token = authHeader.split(' ')[1];
+            const decodedUser = jwt.verify(token, JWT_SECRET);
+            res.send(decodedUser);
+        }
+
+    } catch ({ name, message }) {
+        next({ name, message })
+    }
+});
+
 // GET /api/users/:username/routines
+
+router.get('/:username/routines', async (req, res, next) => {
+    const { username } = req.params;
+
+    try {
+        const authHeader = req.headers.authorization
+
+        if (!authHeader) {
+            res.status(401).send({
+                error: 'No token provided',
+                message: 'You must be logged in to perform this action',
+                name: 'NoTokenError'
+            })
+        }
+        const token = authHeader.split(' ')[1];
+
+        const decodedUser = jwt.verify(token, JWT_SECRET);
+        // const username = decodedUser.username;
+
+        const authUserPublicRoutines = await getPublicRoutinesByUser({ username })
+
+
+        const publicRoutinesByUser = await getPublicRoutinesByUser({ username });
+
+        console.log('publicRoutinesByUser', publicRoutinesByUser)
+
+        res.send(publicRoutinesByUser)
+    } catch ({ name, message }) {
+        next({ name, message })
+    }
+
+
+});
 
 module.exports = router;
