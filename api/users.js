@@ -10,8 +10,11 @@ const {
     getUser,
     getUserById,
     getUserByUsername,
-    getPublicRoutinesByUser
+    getPublicRoutinesByUser,
+    getAllRoutinesByUser
 } = require('../db')
+
+const { requireUser } = require('./utils')
 
 // POST /api/users/register
 
@@ -123,32 +126,23 @@ router.get('/:username/routines', async (req, res, next) => {
 
     try {
         const authHeader = req.headers.authorization
-
-        if (!authHeader) {
-            res.status(401).send({
-                error: 'No token provided',
-                message: 'You must be logged in to perform this action',
-                name: 'NoTokenError'
-            })
-        }
         const token = authHeader.split(' ')[1];
-
         const decodedUser = jwt.verify(token, JWT_SECRET);
-        // const username = decodedUser.username;
+        const loggedInUsername = decodedUser.username
 
-        const authUserPublicRoutines = await getPublicRoutinesByUser({ username })
+        if (username === loggedInUsername) {
+            const allRoutines = await getAllRoutinesByUser({ username: username })
+            res.send(allRoutines)
+        } else {
+            const publicRoutinesByUser = await getPublicRoutinesByUser({ username: username });
+            res.send(publicRoutinesByUser)
+        }
 
-
-        const publicRoutinesByUser = await getPublicRoutinesByUser({ username });
-
-        console.log('publicRoutinesByUser', publicRoutinesByUser)
-
-        res.send(publicRoutinesByUser)
     } catch ({ name, message }) {
         next({ name, message })
     }
-
-
+    
 });
+
 
 module.exports = router;
