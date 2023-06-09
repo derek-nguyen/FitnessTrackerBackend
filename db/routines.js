@@ -145,28 +145,33 @@ async function getPublicRoutinesByUser({ username }) {
 //todo i think my refactor doesnt pass other test
 async function getPublicRoutinesByActivity({ id }) {
   try {
-    const { rows: publicRoutinesActivity } = await client.query(`
+    const { rows: publicRoutinesActivity } = await client.query(
+      `
     select
       u.username as "creatorName" 
     , r.*
     from routines r
     join users u on u.id = r."creatorId"
-    where r."isPublic" = true;
-    `);
+    join routine_activities on r.id = routine_activities."routineId"
+    where r."isPublic" = true
+    and routine_activities."activityId" = $1;
+    `,
+      [id]
+    );
 
     const activityPublicRoutines = await attachActivitiesToRoutines(
       publicRoutinesActivity
     );
 
-    const filteredActivityPublicRoutines = activityPublicRoutines.filter(
-      (obj) => {
-        return obj.activities.some((activity) => {
-          return activity.id === id;
-        });
-      }
-    );
-    console.log("this is fapr", filteredActivityPublicRoutines);
-    return filteredActivityPublicRoutines;
+    // const filteredActivityPublicRoutines = activityPublicRoutines.filter(
+    //   (obj) => {
+    //     return obj.activities.some((activity) => {
+    //       return activity.id === id;
+    //     });
+    //   }
+    // );
+    // console.log("this is fapr", filteredActivityPublicRoutines);
+    return activityPublicRoutines;
   } catch (err) {
     console.error(err);
     throw err;

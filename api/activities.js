@@ -90,7 +90,6 @@ activitiesRouter.patch("/:activityId", async (req, res, next) => {
   }
 });
 
-//todo need to refactor getPublicRoutinesByActivity
 activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
   const { activityId } = req.params;
 
@@ -102,8 +101,10 @@ activitiesRouter.get("/:activityId/routines", async (req, res, next) => {
     });
   }
 
+  console.log("activityid", activityId);
+
   try {
-    const activities = await getPublicRoutinesByActivity({ activityId });
+    const activities = await getPublicRoutinesByActivity({ id: activityId });
 
     res.send(activities);
   } catch (error) {
