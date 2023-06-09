@@ -1,4 +1,5 @@
 const { Pool } = require('pg');
+require("dotenv").config();
 
 const connectionString = process.env.DATABASE_URL || 'https://localhost:5432/fitness-dev';
 
