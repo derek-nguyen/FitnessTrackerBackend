@@ -63,8 +63,9 @@ router.post("/login", async (req, res, next) => {
   const { username, password } = req.body;
 
   const user = await getUserByUsername(username);
+  const authentication = await bcrypt.compare(password, user.password);
 
-  if (user && (await bcrypt.compare(password, user.password))) {
+  if (user && authentication) {
     const payload = {
       id: user.id,
       username: user.username,
